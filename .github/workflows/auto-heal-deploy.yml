@@ -31,18 +31,15 @@ jobs:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: |
         python src/gemini_healer.py --path . --api-key "$GEMINI_API_KEY"
+        echo "AI healing completed. Manual review recommended."
 
-    - name: Commit AI fixes
+    - name: Show changes made by AI
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub AI Action"
-        git add .
-        git diff --staged --quiet || git commit -m "🤖 AI Auto-Heal: Fix project structure and file names"
-        git push
+        git status
+        git diff
 
   deploy:
     runs-on: ubuntu-latest
-    needs: ai-auto-heal
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
