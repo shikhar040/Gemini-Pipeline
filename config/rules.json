@@ -1,0 +1,21 @@
+{
+  "netlify_requirements": {
+    "required_files": ["public/index.html", "netlify.toml"],
+    "recommended_structure": {
+      "public/": ["Static files", "HTML/CSS/JS"],
+      "src/": ["Source code", "Python scripts"],
+      "config/": ["Configuration files"]
+    }
+  },
+  "auto_healing_rules": {
+    "rename_patterns": {
+      "spaces_to_hyphens": true,
+      "lowercase_filenames": true,
+      "fix_common_extensions": true
+    },
+    "create_missing": {
+      "public/index.html": "<!DOCTYPE html>\\n<!-- Auto-generated -->",
+      "README.md": "# Project\\n\\nAuto-healed by AI"
+    }
+  }
+}

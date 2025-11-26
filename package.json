@@ -1,0 +1,13 @@
+{
+  "name": "ai-auto-healing-pipeline",
+  "version": "1.0.0",
+  "description": "AI-powered auto-healing pipeline with Gemini AI, GitHub Actions, and Netlify",
+  "scripts": {
+    "scan": "python scripts/check_project.py",
+    "heal": "python scripts/main.py --heal",
+    "dev": "python scripts/main.py"
+  },
+  "keywords": ["ai", "auto-healing", "netlify", "github-actions"],
+  "author": "AI Auto-Healer",
+  "license": "MIT"
+}

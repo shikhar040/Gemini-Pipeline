@@ -1,0 +1,19 @@
+{
+  "file_naming": {
+    "allowed_characters": "a-z0-9-._",
+    "preferred_separator": "-",
+    "max_length": 50
+  },
+  "extensions": {
+    "web": [".html", ".css", ".js", ".json", ".txt", ".md"],
+    "python": [".py", ".pyc", ".pyo", ".pyd"],
+    "config": [".toml", ".yaml", ".yml", ".json", ".ini"]
+  },
+  "ignored_directories": [
+    "__pycache__",
+    ".git",
+    "node_modules",
+    ".DS_Store",
+    "Thumbs.db"
+  ]
+}
