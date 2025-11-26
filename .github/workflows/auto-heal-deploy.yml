@@ -5,6 +5,7 @@ on:
     branches: [ main, master ]
   schedule:
     - cron: '0 0 * * 0'  # Weekly auto-healing on Sunday
+  workflow_dispatch:  # Allow manual triggering
 
 jobs:
   ai-auto-heal:
@@ -26,23 +27,58 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests pathlib2
 
+    - name: Debug - List files before healing
+      run: |
+        echo "📁 Files before AI healing:"
+        find . -name "*.htm*" -o -name "*.jx" -o -name "* *" | head -20
+
     - name: Run Gemini AI Auto-Healer
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: |
+        echo "🚀 Starting AI Auto-Healing..."
         python src/gemini_healer.py --path . --api-key "$GEMINI_API_KEY"
-        echo "AI healing completed. Manual review recommended."
+        echo "✅ AI healing process completed"
+
+    - name: Debug - List files after healing
+      run: |
+        echo "📁 Files after AI healing:"
+        find . -name "*.htm*" -o -name "*.jx" -o -name "* *" | head -20
 
     - name: Show changes made by AI
       run: |
+        echo "🔍 Git status after healing:"
         git status
+        echo "📊 Git diff after healing:"
         git diff
+
+    - name: Create healing report
+      run: |
+        echo "## 🤖 AI Auto-Healing Report" > healing-report.md
+        echo "**Scan Date:** $(date)" >> healing-report.md
+        echo "" >> healing-report.md
+        echo "### Files Modified:" >> healing-report.md
+        git status --porcelain | while read status file; do
+          echo "- $status $file" >> healing-report.md
+        done
 
   deploy:
     runs-on: ubuntu-latest
+    needs: ai-auto-heal
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Verify deployment files
+      run: |
+        echo "🔍 Checking deployment files..."
+        if [ -f "public/index.html" ]; then
+          echo "✅ public/index.html exists - Ready for deployment"
+        else
+          echo "❌ public/index.html missing - Checking alternatives..."
+          find . -name "index.html" -o -name "index.htm" | head -10
+          exit 1
+        fi
 
     - name: Deploy to Netlify
       uses: nwtgck/actions-netlify@v2.0
@@ -50,8 +86,13 @@ jobs:
         publish-dir: './public'
         production-branch: main
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        deploy-message: "Deploy from AI Auto-Healing Pipeline"
+        deploy-message: "Deploy from AI Auto-Healing Pipeline - $(date)"
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
       timeout-minutes: 5
+
+    - name: Notify deployment status
+      run: |
+        echo "🎉 Deployment completed successfully!"
+        echo "🌐 Your site is live at: https://${{ secrets.NETLIFY_SITE_ID }}.netlify.app"
