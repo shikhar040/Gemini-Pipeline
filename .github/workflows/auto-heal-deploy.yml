@@ -17,63 +17,30 @@ jobs:
       with:
         python-version: '3.9'
 
-    - name: Install dependencies
+    - name: DEBUG - Show files before healing
       run: |
-        python -m pip install --upgrade pip
-        pip install requests
+        echo "📁 FILES BEFORE HEALING:"
+        find . -name "* *" -o -name "*.jx" -o -name "*.htm" -o -name "*.PY" -o -name "*@*" | head -20
 
-    - name: DEBUG - Show all problematic files
+    - name: Run SIMPLE Auto-Healer
       run: |
-        echo "🔍 SCANNING FOR PROBLEMATIC FILES:"
-        echo "Files with spaces:"
-        find . -name "* *" | head -10
-        echo "Files with wrong extensions:"
-        find . -name "*.jx" -o -name "*.htm" -o -name "*.PY" | head -10
-        echo "Files with special chars:"
-        find . -name "*@*" -o -name "*#*" -o -name "*\$*" | head -10
+        echo "🔧 RUNNING SIMPLE AUTO-HEALER..."
+        python src/gemini_healer.py
 
-    - name: Auto-fix critical file issues
+    - name: DEBUG - Show files after healing
       run: |
-        echo "🚨 STARTING AUTO-FIX PROCESS..."
-        
-        # Fix index.htm to index.html (CRITICAL)
-        if [ -f "public/index.htm" ]; then
-          echo "🛠️ FIXING: public/index.htm → public/index.html"
-          mv "public/index.htm" "public/index.html"
-        fi
-        
-        # Fix files with spaces
-        echo "🛠️ Fixing files with spaces..."
-        find . -name "* *" | while read file; do
-          new_name=$(echo "$file" | tr " " "-" | tr '[:upper:]' '[:lower:]')
-          if [ "$file" != "$new_name" ]; then
-            echo "FIXING: $file → $new_name"
-            mv "$file" "$new_name"
-          fi
-        done
-        
-        # Fix wrong extensions
-        echo "🛠️ Fixing file extensions..."
-        find . -name "*.jx" -exec bash -c 'echo "FIXING: {} → {}.js" && mv "{}" "{}.js"' \;
-        find . -name "*.htm" ! -name "*.html" -exec bash -c 'echo "FIXING: {} → {}l" && mv "{}" "{}l"' \;
-        find . -name "*.PY" -exec bash -c 'echo "FIXING: {} → {}.py" && mv "{}" "{}.py" && mv "{}.py" "$(echo {} | sed "s/.PY$/.py/")"' \;
-
-    - name: Run Gemini AI Auto-Healer
-      env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      run: |
-        echo "🤖 RUNNING GEMINI AI..."
-        if [ -f "src/gemini_healer.py" ]; then
-          python src/gemini_healer.py --path . --api-key "$GEMINI_API_KEY" || echo "AI completed"
-        fi
-
-    - name: DEBUG - Show final result
-      run: |
-        echo "✅ FINAL FILE CHECK:"
-        echo "All files in public/:"
+        echo "📁 FILES AFTER HEALING:"
+        find . -name "* *" -o -name "*.jx" -o -name "*.htm" -o -name "*.PY" -o -name "*@*" | head -20
+        echo "🔍 PUBLIC FOLDER:"
         ls -la public/
-        echo "Git status:"
-        git status
+
+    - name: Commit fixes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git diff --staged --quiet || git commit -m "🤖 AUTO-HEAL: Fix file names"
+        git push
 
   deploy:
     runs-on: ubuntu-latest
@@ -88,7 +55,7 @@ jobs:
         publish-dir: './public'
         production-branch: main
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        deploy-message: "AI Auto-heal test"
+        deploy-message: "Auto-healed deployment"
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
