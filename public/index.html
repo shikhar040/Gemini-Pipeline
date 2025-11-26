@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Auto-Healing Pipeline</title>
+    <title>AI Auto-Healing Pipeline - LIVE</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
+            font-family: 'Arial', sans-serif;
+            max-width: 900px;
             margin: 0 auto;
             padding: 40px 20px;
             line-height: 1.6;
@@ -17,39 +17,169 @@
         }
         .container {
             background: rgba(255,255,255,0.1);
-            padding: 30px;
-            border-radius: 15px;
+            padding: 40px;
+            border-radius: 20px;
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
         }
         .feature {
             background: rgba(255,255,255,0.2);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 4px solid #00ff88;
+        }
+        .status {
+            background: rgba(0,255,136,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .time-display {
+            background: rgba(255,255,255,0.3);
             padding: 15px;
-            margin: 10px 0;
+            border-radius: 10px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        .fix-list {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
             border-radius: 8px;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🤖 AI Auto-Healing Pipeline</h1>
+        <p class="subtitle">Powered by Gemini AI + GitHub Actions + Netlify</p>
+        
+        <div class="time-display">
+            <div>🕒 Current Time:</div>
+            <div id="live-time" style="font-size: 1.5em; font-weight: bold; margin: 10px 0;"></div>
+            <div id="live-date" style="opacity: 0.9;"></div>
+        </div>
+
+        <div class="status">
+            <h2>🚀 Status: <span style="color: #00ff88;">ACTIVE & RUNNING</span></h2>
+            <p>Auto-healer is monitoring and fixing file issues automatically</p>
+        </div>
+
         <div class="feature">
-            <h2>🚀 Features:</h2>
+            <h3>🎯 What This Pipeline Does:</h3>
             <ul>
-                <li>Gemini AI-powered file healing</li>
-                <li>Automatic project structure optimization</li>
-                <li>GitHub Actions automation</li>
-                <li>Netlify deployment</li>
-                <li>Weekly auto-healing schedule</li>
+                <li>✅ Automatically scans your project for issues</li>
+                <li>✅ Fixes file names, extensions, and structure</li>
+                <li>✅ Deploys to Netlify automatically</li>
+                <li>✅ Runs on every push + weekly maintenance</li>
+                <li>✅ Real-time monitoring and healing</li>
             </ul>
         </div>
+
         <div class="feature">
-            <h2>📊 Status: <span style="color: #00ff88;">ACTIVE</span></h2>
-            <p>Last healed: <span id="current-date"></span></p>
+            <h3>🔧 Auto-Healing Capabilities:</h3>
+            <div class="fix-list">
+                <strong>File Extensions:</strong>
+                <ul>
+                    <li><code>.jx</code> → <code>.js</code></li>
+                    <li><code>.htm</code> → <code>.html</code></li>
+                    <li><code>.PY</code> → <code>.py</code></li>
+                    <li><code>.cssx</code> → <code>.css</code></li>
+                </ul>
+            </div>
+            <div class="fix-list">
+                <strong>File Names:</strong>
+                <ul>
+                    <li>Spaces → Hyphens: <code>my file.js</code> → <code>my-file.js</code></li>
+                    <li>Special chars removed: <code>file@name.html</code> → <code>file-name.html</code></li>
+                    <li>Lowercase conversion: <code>MYFILE.js</code> → <code>myfile.js</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="feature">
+            <h3>📊 Pipeline Information:</h3>
+            <p><strong>Repository:</strong> Gemini-Pipeline</p>
+            <p><strong>Last Auto-Heal:</strong> <span id="last-update">Checking...</span></p>
+            <p><strong>Next Scheduled Heal:</strong> Weekly on Sunday</p>
+            <p><strong>Site URL:</strong> <a href="https://gemini-pipeline.netlify.app" style="color: #00ff88;">gemini-pipeline.netlify.app</a></p>
+        </div>
+
+        <div class="time-display" style="background: rgba(255,255,255,0.2);">
+            <div>🔄 Page Last Refreshed:</div>
+            <div id="page-refresh-time" style="font-size: 1.1em; margin: 5px 0;"></div>
         </div>
     </div>
 
     <script>
-        document.getElementById('current-date').textContent = new Date().toLocaleDateString();
+        function updateTime() {
+            const now = new Date();
+            
+            // Live time display
+            const liveTime = now.toLocaleTimeString('en-US', { 
+                hour12: true,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            const liveDate = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            document.getElementById('live-time').textContent = liveTime;
+            document.getElementById('live-date').textContent = liveDate;
+            
+            // Page refresh time
+            const refreshTime = now.toLocaleTimeString();
+            document.getElementById('page-refresh-time').textContent = refreshTime;
+            
+            // Set last update time (simulated - you can make this dynamic)
+            const lastUpdate = new Date(now - 5 * 60 * 1000); // 5 minutes ago for demo
+            document.getElementById('last-update').textContent = lastUpdate.toLocaleString();
+        }
+        
+        // Update time immediately
+        updateTime();
+        
+        // Update time every second
+        setInterval(updateTime, 1000);
+        
+        // Add some visual feedback
+        let updateCount = 0;
+        setInterval(() => {
+            updateCount++;
+            const timeElement = document.getElementById('live-time');
+            if (updateCount % 10 === 0) {
+                timeElement.style.color = '#00ff88';
+                setTimeout(() => {
+                    timeElement.style.color = 'white';
+                }, 500);
+            }
+        }, 1000);
+        
+        // Page load time
+        window.addEventListener('load', () => {
+            console.log('🚀 AI Auto-Healing Pipeline loaded successfully!');
+        });
     </script>
 </body>
 </html>
